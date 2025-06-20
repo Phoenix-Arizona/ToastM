@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Color Timer</title>
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      transition: background-color 1s;
+    }
+
+    #controls {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .input-group {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    .color-label {
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: black;
+      font-weight: bold;
+      width: 60px;
+    }
+
+    .green-label {
+      background-color: #90ee90;
+    }
+
+    .yellow-label {
+      background-color: #ffff99;
+    }
+
+    .red-label {
+      background-color: #ff7f7f;
+    }
+
+    input {
+      width: 60px;
+      text-align: center;
+      margin-left: 10px;
+      margin-right: 5px;
+    }
+
+    button {
+      padding: 5px 10px;
+      font-size: 1rem;
+      margin-top: 10px;
+    }
+
+    #redTimerContainer {
+      position: fixed;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      text-align: center;
+      display: none;
+    }
+
+    #timerButton {
+      width: 80px;
+      height: 30px;
+      font-size: 0.7rem;
+      margin-bottom: 5px;
+      cursor: default;
+    }
+
+    #stopBtn {
+      display: none;
+    }
+  </style>
+</head>
+<body style="background-color: white;">
+  <div id="controls">
+    <div class="input-group">
+      <span class="color-label green-label">Green:</span>
+      <input type="number" id="n1" min="0" value="1"> minute(s)
+    </div>
+    <div class="input-group">
+      <span class="color-label yellow-label">Yellow:</span>
+      <input type="number" id="n2" min="0" value="2"> minute(s)
+    </div>
+    <div class="input-group">
+      <span class="color-label red-label">Red:</span>
+      <input type="number" id="n3" min="0" value="3"> minutes
+    </div>
+    <button onclick="startSequence()">Start</button>
+  </div>
+
+  <div id="redTimerContainer">
+    <button id="timerButton" disabled>00:00</button>
+    <button id="stopBtn" onclick="stopRedTimer()">Stop</button>
+  </div>
+
+  <script>
+    let globalStartTime;
+    let updateTimerInterval;
+    let n1, n2, n3;
+
+    function startSequence() {
+      n1 = parseInt(document.getElementById('n1').value);
+      n2 = parseInt(document.getElementById('n2').value);
+      n3 = parseInt(document.getElementById('n3').value);
+
+      if (isNaN(n1) || isNaN(n2) || isNaN(n3) || !(n1 < n2 && n2 < n3)) {
+        alert("Please enter valid numbers: Green < Yellow < Red");
+        return;
+      }
+
+      document.getElementById('controls').style.display = 'none';
+      document.body.style.backgroundColor = "white";
+
+      document.getElementById('redTimerContainer').style.display = 'block';
+      document.getElementById('stopBtn').style.display = 'none';
+
+      globalStartTime = Date.now();
+
+      updateTimerInterval = setInterval(updateTimerDisplay, 1000);
+      updateTimerDisplay();
+
+      const t1 = n1 * 60000;
+      const t2 = n2 * 60000;
+      const t3 = n3 * 60000;
+
+      setTimeout(() => {
+        document.body.style.backgroundColor = "green";
+      }, t1);
+
+      setTimeout(() => {
+        document.body.style.backgroundColor = "yellow";
+      }, t2);
+
+      setTimeout(() => {
+        document.body.style.backgroundColor = "red";
+        document.getElementById('stopBtn').style.display = 'inline-block';
+      }, t3);
+    }
+
+    function updateTimerDisplay() {
+      const now = Date.now();
+      const elapsed = now - globalStartTime;
+      const mins = Math.floor(elapsed / 60000);
+      const secs = Math.floor((elapsed % 60000) / 1000);
+      document.getElementById('timerButton').innerText =
+        `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function stopRedTimer() {
+      clearInterval(updateTimerInterval);
+    }
+  </script>
+</body>
+</html>
